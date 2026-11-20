@@ -1,0 +1,25 @@
+services:
+  user-service:
+    build: .
+    command: uvicorn user_service:app --host 0.0.0.0 --port 8001
+    ports:
+      - "8001:8001"
+
+  product-service:
+    build: .
+    command: uvicorn product_service:app --host 0.0.0.0 --port 8002
+    ports:
+      - "8002:8002"
+      
+  api-gateway:
+    build: .
+    command: uvicorn gateway:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+      #host port:container port
+    environment:
+      - USER_SERVICE_URL=http://user-service:8001
+      - PRODUCT_SERVICE_URL=http://product-service:8002
+    depends_on:
+      - user-service
+      - product-service
